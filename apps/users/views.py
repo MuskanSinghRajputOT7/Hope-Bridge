@@ -1,17 +1,15 @@
-# apps/users/views.py
-
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from django.contrib.auth import authenticate
+from django.views.decorators.csrf import csrf_exempt
 from .models import User, NGO
 from .serializers import UserSerializer, RegisterSerializer, NGOSerializer
 from .authentication import generate_jwt_token
 
-# ============ YOUR API VIEWS ============
-# (Keep all your existing API functions here)
-
+# ============ REGISTER ============
+@csrf_exempt
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def register(request):
@@ -25,6 +23,8 @@ def register(request):
         }, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+# ============ LOGIN ============
+@csrf_exempt
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login(request):
@@ -45,6 +45,7 @@ def login(request):
         'message': 'Invalid credentials'
     }, status=status.HTTP_401_UNAUTHORIZED)
 
+# ============ GET USER ============
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_user(request, user_id):
@@ -57,6 +58,32 @@ def get_user(request, user_id):
             'error': 'User not found'
         }, status=status.HTTP_404_NOT_FOUND)
 
+# ============ UPDATE PROFILE ============
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_profile(request, user_id):
+    """Update user profile"""
+    try:
+        user = User.objects.get(user_id=user_id)
+        
+        # Check if user is updating their own profile
+        if request.user.user_id != user.user_id:
+            return Response({
+                'error': 'You can only update your own profile'
+            }, status=status.HTTP_403_FORBIDDEN)
+        
+        serializer = UserSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    except User.DoesNotExist:
+        return Response({
+            'error': 'User not found'
+        }, status=status.HTTP_404_NOT_FOUND)
+
+# ============ CREATE NGO ============
+@csrf_exempt
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_ngo(request):
@@ -83,6 +110,7 @@ def create_ngo(request):
         }, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+# ============ LIST NGOS ============
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def list_ngos(request):

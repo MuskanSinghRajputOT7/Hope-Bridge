@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HopeBridge - Child Support Platform</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+        h1 {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .features {
+            text-align: left;
+            margin: 20px 0;
+            padding: 0 20px;
+        }
+        .features li {
+            list-style: none;
+            padding: 8px 0;
+            color: #555;
+        }
+        .features li:before {
+            content: "✅ ";
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            margin: 10px 5px;
+            transition: 0.3s;
+        }
+        .btn:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #667eea;
+            color: #667eea;
+        }
+        .btn-outline:hover {
+            background: #667eea;
+            color: white;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f0f4ff;
+            border-radius: 8px;
+            color: #333;
+        }
+        .api-url {
+            font-family: monospace;
+            background: #e8ecf1;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏠 HopeBridge</h1>
+        <p class="subtitle">Child Support & Adoption Assistance Platform</p>
+        
+        <div class="features">
+            <li>Child Sponsorship (Education, Food, Healthcare)</li>
+            <li>Adoption Guidance & Legal Support</li>
+            <li>Volunteer Registration & Visit Scheduling</li>
+            <li>Transparent Donation Tracking</li>
+            <li>Analytics Dashboard for NGOs</li>
+            <li>AI Chatbot for FAQs</li>
+        </div>
+
+        <div>
+            <a href="/admin/" class="btn">🔐 Admin Panel</a>
+            <a href="/api/auth/register/" class="btn btn-outline">📝 Register</a>
+        </div>
+
+        <div class="status">
+            <strong>✅ Server Status:</strong> Running<br>
+            <strong>📡 API Base:</strong> <span class="api-url">/api/auth/</span>
+        </div>
+    </div>
+</body>
+</html>
