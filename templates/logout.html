@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Logout - HopeBridge{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 450px; margin: 80px auto; text-align: center;">
+    <div class="card" style="padding: 50px;">
+        <i class="fas fa-sign-out-alt" style="font-size: 4rem; color: #667eea;"></i>
+        <h2 style="margin: 20px 0;">You have been logged out</h2>
+        <p style="color: #777; margin-bottom: 30px;">Thank you for using HopeBridge!</p>
+
+        <a href="/login/" class="btn btn-primary" style="margin: 5px;">
+            <i class="fas fa-sign-in-alt"></i> Login Again
+        </a>
+        <a href="/" class="btn btn-outline" style="margin: 5px;">
+            <i class="fas fa-home"></i> Go Home
+        </a>
+    </div>
+</div>
+
+<script>
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+</script>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}NGOs - HopeBridge{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 style="margin: 30px 0;"><i class="fas fa-building" style="color: #667eea;"></i> NGOs</h2>
+
+    <div id="ngoContainer">
+        <p>Loading NGOs...</p>
+    </div>
+</div>
+
+<script>
+    async function fetchNGOs() {
+        try {
+            const response = await fetch('/api/auth/ngo/list/');
+            const data = await response.json();
+
+            const container = document.getElementById('ngoContainer');
+
+            if (data.ngos && data.ngos.length > 0) {
+                container.innerHTML = data.ngos.map(ngo => `
+                    <div class="card" style="margin: 15px 0;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+                            <div>
+                                <h3>${ngo.name}</h3>
+                                <p><i class="fas fa-map-marker-alt"></i> ${ngo.city}, ${ngo.state}</p>
+                                <p><i class="fas fa-child"></i> Children: ${ngo.total_children || 0}</p>
+                                <p><i class="fas fa-check-circle" style="color: ${ngo.is_verified ? '#28a745' : '#ffc107'}"></i>
+                                    ${ngo.is_verified ? 'Verified ✅' : 'Pending Verification ⏳'}
+                                </p>
+                            </div>
+                            <a href="/ngo/${ngo.ngo_id}/" class="btn btn-primary">View Details</a>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                container.innerHTML = `
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> No NGOs registered yet.
+                    </div>
+                `;
+            }
+        } catch (error) {
+            document.getElementById('ngoContainer').innerHTML = `
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> No NGOs available yet.
+                </div>
+            `;
+        }
+    }
+
+    fetchNGOs();
+</script>
+{% endblock %}

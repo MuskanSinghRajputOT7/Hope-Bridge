@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile - HopeBridge{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 600px; margin: 40px auto;">
+    <div class="card" style="padding: 40px;">
+        <h2 style="text-align: center; margin-bottom: 30px;">
+            <i class="fas fa-user-circle" style="color: #667eea;"></i> My Profile
+        </h2>
+
+        <div id="alertContainer"></div>
+
+        <div style="text-align: center; margin-bottom: 20px;">
+            <img id="profilePhoto" src="https://via.placeholder.com/120"
+                 style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid #667eea;">
+        </div>
+
+        <form id="profileForm">
+            <div class="form-group">
+                <label><i class="fas fa-user"></i> Full Name</label>
+                <input type="text" id="name" placeholder="Enter your name" required>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-envelope"></i> Email (Cannot change)</label>
+                <input type="email" id="email" disabled style="background: #f5f5f5;">
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-phone"></i> Phone</label>
+                <input type="tel" id="phone" placeholder="Enter your phone" required>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-user-tag"></i> Role</label>
+                <input type="text" id="role" disabled style="background: #f5f5f5;">
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px;">
+                <i class="fas fa-save"></i> Update Profile
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const user = JSON.parse(localStorage.getItem('user'));
+        const token = localStorage.getItem('token');
+
+        if (!user || !token) {
+            window.location.href = '/login/';
+            return;
+        }
+
+        document.getElementById('name').value = user.name || '';
+        document.getElementById('email').value = user.email || '';
+        document.getElementById('phone').value = user.phone || '';
+        document.getElementById('role').value = user.role || '';
+
+        if (user.profile_photo) {
+            document.getElementById('profilePhoto').src = user.profile_photo;
+        }
+    });
+
+    document.getElementById('profileForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const user = JSON.parse(localStorage.getItem('user'));
+        const token = localStorage.getItem('token');
+        const alertContainer = document.getElementById('alertContainer');
+
+        const name = document.getElementById('name').value;
+        const phone = document.getElementById('phone').value;
+
+        const submitBtn = this.querySelector('button[type="submit"]');
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+        submitBtn.disabled = true;
+
+        try {
+            const response = await fetch(`/api/auth/user/${user.user_id}/update/`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ name, phone })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                const updatedUser = { ...user, name, phone };
+                localStorage.setItem('user', JSON.stringify(updatedUser));
+
+                alertContainer.innerHTML = `
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i> Profile updated successfully!
+                    </div>
+                `;
+            } else {
+                alertContainer.innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle"></i> ${data.error || 'Update failed'}
+                    </div>
+                `;
+            }
+        } catch (error) {
+            alertContainer.innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-circle"></i> Network error. Please try again.
+                </div>
+            `;
+        }
+
+        submitBtn.innerHTML = '<i class="fas fa-save"></i> Update Profile';
+        submitBtn.disabled = false;
+    });
+</script>
+{% endblock %}

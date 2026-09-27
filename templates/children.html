@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}Children - HopeBridge{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 style="margin: 30px 0;"><i class="fas fa-child" style="color: #667eea;"></i> Children</h2>
+
+    <div id="childrenContainer">
+        <p>Loading children...</p>
+    </div>
+</div>
+
+<script>
+    async function fetchChildren() {
+        try {
+            const response = await fetch('/api/donations/children/');
+            const data = await response.json();
+
+            const container = document.getElementById('childrenContainer');
+
+            if (data.children && data.children.length > 0) {
+                container.innerHTML = data.children.map(child => `
+                    <div class="card" style="margin: 15px 0;">
+                        <div style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
+                            <div style="flex: 1;">
+                                <h3>${child.name}</h3>
+                                <p><i class="fas fa-calendar-alt"></i> Age: ${child.age}</p>
+                                <p><i class="fas fa-venus-mars"></i> Gender: ${child.gender}</p>
+                                <p><i class="fas fa-heart" style="color: ${child.is_sponsored ? '#28a745' : '#ff6b6b'}"></i>
+                                    ${child.is_sponsored ? 'Sponsored' : 'Available for Sponsorship'}
+                                </p>
+                                ${!child.is_sponsored ? `<a href="/sponsor/${child.child_id}/" class="btn btn-primary" style="margin-top: 10px;">
+                                    <i class="fas fa-hand-holding-heart"></i> Sponsor Now
+                                </a>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                container.innerHTML = `
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> No children available yet.
+                    </div>
+                `;
+            }
+        } catch (error) {
+            document.getElementById('childrenContainer').innerHTML = `
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> No children added yet. (Coming soon!)
+                </div>
+            `;
+        }
+    }
+
+    fetchChildren();
+</script>
+{% endblock %}

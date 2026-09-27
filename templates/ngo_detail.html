@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}NGO Details - HopeBridge{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top: 30px;">
+    <div id="ngoDetail">
+        <p>Loading NGO details...</p>
+    </div>
+</div>
+
+<script>
+    const ngoId = window.location.pathname.split('/')[2];
+
+    async function fetchNGODetail() {
+        try {
+            const response = await fetch(`/api/auth/ngo/${ngoId}/`);
+            const ngo = await response.json();
+
+            const container = document.getElementById('ngoDetail');
+
+            container.innerHTML = `
+                <div class="card" style="padding: 40px;">
+                    <h2>${ngo.name}</h2>
+                    <p><i class="fas fa-map-marker-alt"></i> ${ngo.address}, ${ngo.city}, ${ngo.state} - ${ngo.pincode}</p>
+                    <p><i class="fas fa-phone"></i> ${ngo.phone || 'Not provided'}</p>
+                    <p><i class="fas fa-envelope"></i> ${ngo.email || 'Not provided'}</p>
+                    <p><i class="fas fa-users"></i> Capacity: ${ngo.capacity || 0}</p>
+                    <p><i class="fas fa-child"></i> Children: ${ngo.total_children || 0}</p>
+                    <p><i class="fas fa-check-circle" style="color: ${ngo.is_verified ? '#28a745' : '#ffc107'}"></i>
+                        ${ngo.is_verified ? 'Verified NGO ✅' : 'Pending Verification ⏳'}
+                    </p>
+
+                    <h3 style="margin-top: 20px;">Mission</h3>
+                    <p>${ngo.mission || 'No mission statement provided.'}</p>
+
+                    <div style="margin-top: 20px;">
+                        <a href="/children/" class="btn btn-primary">
+                            <i class="fas fa-child"></i> View Children
+                        </a>
+                    </div>
+                </div>
+            `;
+        } catch (error) {
+            document.getElementById('ngoDetail').innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-circle"></i> NGO not found.
+                </div>
+            `;
+        }
+    }
+
+    fetchNGODetail();
+</script>
+{% endblock %}

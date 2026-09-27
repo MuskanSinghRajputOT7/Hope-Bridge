@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block title %}Register - HopeBridge{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 500px; margin: 40px auto;">
+    <div class="card" style="padding: 40px;">
+        <h2 style="text-align: center; margin-bottom: 30px;">
+            <i class="fas fa-user-plus" style="color: #667eea;"></i> Create Account
+        </h2>
+
+        <div id="alertContainer"></div>
+
+        <form id="registerForm">
+            <div class="form-group">
+                <label><i class="fas fa-user"></i> Full Name</label>
+                <input type="text" id="name" placeholder="Enter your full name" required>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-envelope"></i> Email</label>
+                <input type="email" id="email" placeholder="Enter your email" required>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-phone"></i> Phone</label>
+                <input type="tel" id="phone" placeholder="Enter your phone number" required>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-user-tag"></i> Role</label>
+                <select id="role" required>
+                    <option value="">Select your role</option>
+                    <option value="donor">Donor</option>
+                    <option value="ngo_staff">NGO Staff</option>
+                    <option value="volunteer">Volunteer</option>
+                    <option value="adoptive_parent">Adoptive Parent</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-key"></i> Password</label>
+                <input type="password" id="password" placeholder="Create a password" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px;">
+                <i class="fas fa-user-plus"></i> Register
+            </button>
+        </form>
+
+        <p style="text-align: center; margin-top: 20px; color: #777;">
+            Already have an account? <a href="/login/" style="color: #667eea;">Login here</a>
+        </p>
+    </div>
+</div>
+
+<script>
+    document.getElementById('registerForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const phone = document.getElementById('phone').value;
+        const role = document.getElementById('role').value;
+        const password = document.getElementById('password').value;
+        const alertContainer = document.getElementById('alertContainer');
+
+        const submitBtn = this.querySelector('button[type="submit"]');
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registering...';
+        submitBtn.disabled = true;
+
+        try {
+            const response = await fetch('/api/auth/register/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email, phone, role, password })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                alertContainer.innerHTML = `
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i> Registration successful! Redirecting to login...
+                    </div>
+                `;
+                setTimeout(() => { window.location.href = '/login/'; }, 2000);
+            } else {
+                const errors = Object.values(data).flat().join(', ');
+                alertContainer.innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle"></i> ${errors || 'Registration failed'}
+                    </div>
+                `;
+                submitBtn.innerHTML = '<i class="fas fa-user-plus"></i> Register';
+                submitBtn.disabled = false;
+            }
+        } catch (error) {
+            alertContainer.innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-circle"></i> Network error. Please try again.
+                </div>
+            `;
+            submitBtn.innerHTML = '<i class="fas fa-user-plus"></i> Register';
+            submitBtn.disabled = false;
+        }
+    });
+</script>
+{% endblock %}

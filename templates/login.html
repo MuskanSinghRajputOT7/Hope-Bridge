@@ -1,31 +1,88 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>HopeBridge Login</title>
-</head>
-<body>
-    <h1>Login to HopeBridge</h1>
-    <form id="loginForm">
-        <input type="email" id="email" placeholder="Email" required>
-        <input type="password" id="password" placeholder="Password" required>
-        <button type="submit">Login</button>
-    </form>
-    <div id="result"></div>
+{% extends 'base.html' %}
 
-    <script>
-        document.getElementById('loginForm').onsubmit = async function(e) {
-            e.preventDefault();
+{% block title %}Login - HopeBridge{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 450px; margin: 60px auto;">
+    <div class="card" style="padding: 40px;">
+        <h2 style="text-align: center; margin-bottom: 30px;">
+            <i class="fas fa-lock" style="color: #667eea;"></i> Login
+        </h2>
+
+        <div id="alertContainer"></div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label><i class="fas fa-envelope"></i> Email</label>
+                <input type="email" id="email" placeholder="Enter your email" required>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-key"></i> Password</label>
+                <input type="password" id="password" placeholder="Enter your password" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px;">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </button>
+        </form>
+
+        <p style="text-align: center; margin-top: 20px; color: #777;">
+            Don't have an account? <a href="/register/" style="color: #667eea;">Register here</a>
+        </p>
+    </div>
+</div>
+
+<script>
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const alertContainer = document.getElementById('alertContainer');
+
+        const submitBtn = this.querySelector('button[type="submit"]');
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+        submitBtn.disabled = true;
+
+        try {
             const response = await fetch('/api/auth/login/', {
                 method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    email: document.getElementById('email').value,
-                    password: document.getElementById('password').value
-                })
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
             });
+
             const data = await response.json();
-            document.getElementById('result').textContent = JSON.stringify(data, null, 2);
-        };
-    </script>
-</body>
-</html>
+
+            if (data.success) {
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('user', JSON.stringify(data.user));
+
+                alertContainer.innerHTML = `
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i> Login successful! Redirecting...
+                    </div>
+                `;
+
+                setTimeout(() => { window.location.href = '/dashboard/'; }, 1000);
+            } else {
+                alertContainer.innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle"></i> ${data.message || 'Invalid credentials'}
+                    </div>
+                `;
+                submitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
+                submitBtn.disabled = false;
+            }
+        } catch (error) {
+            alertContainer.innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-circle"></i> Network error. Please try again.
+                </div>
+            `;
+            submitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
+            submitBtn.disabled = false;
+        }
+    });
+</script>
+{% endblock %}

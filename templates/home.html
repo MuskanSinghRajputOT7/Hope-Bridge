@@ -1,110 +1,61 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>HopeBridge - Child Support Platform</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .container {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            text-align: center;
-            max-width: 500px;
-            width: 90%;
-        }
-        h1 {
-            font-size: 2.5rem;
-            color: #333;
-            margin-bottom: 10px;
-        }
-        .subtitle {
-            color: #666;
-            margin-bottom: 30px;
-        }
-        .features {
-            text-align: left;
-            margin: 20px 0;
-            padding: 0 20px;
-        }
-        .features li {
-            list-style: none;
-            padding: 8px 0;
-            color: #555;
-        }
-        .features li:before {
-            content: "✅ ";
-        }
-        .btn {
-            display: inline-block;
-            padding: 12px 30px;
-            background: #667eea;
-            color: white;
-            text-decoration: none;
-            border-radius: 8px;
-            margin: 10px 5px;
-            transition: 0.3s;
-        }
-        .btn:hover {
-            background: #764ba2;
-            transform: translateY(-2px);
-        }
-        .btn-outline {
-            background: transparent;
-            border: 2px solid #667eea;
-            color: #667eea;
-        }
-        .btn-outline:hover {
-            background: #667eea;
-            color: white;
-        }
-        .status {
-            margin-top: 20px;
-            padding: 15px;
-            background: #f0f4ff;
-            border-radius: 8px;
-            color: #333;
-        }
-        .api-url {
-            font-family: monospace;
-            background: #e8ecf1;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 0.9rem;
-        }
-    </style>
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% block title %}Home - HopeBridge{% endblock %}
+
+{% block content %}
+<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 80px 20px; text-align: center;">
     <div class="container">
-        <h1>🏠 HopeBridge</h1>
-        <p class="subtitle">Child Support & Adoption Assistance Platform</p>
-        
-        <div class="features">
-            <li>Child Sponsorship (Education, Food, Healthcare)</li>
-            <li>Adoption Guidance & Legal Support</li>
-            <li>Volunteer Registration & Visit Scheduling</li>
-            <li>Transparent Donation Tracking</li>
-            <li>Analytics Dashboard for NGOs</li>
-            <li>AI Chatbot for FAQs</li>
-        </div>
-
+        <h1 style="font-size: 3.5rem; margin-bottom: 20px;">🏠 Welcome to HopeBridge</h1>
+        <p style="font-size: 1.3rem; max-width: 600px; margin: 0 auto 30px; opacity: 0.9;">
+            Connecting children in need with loving sponsors, volunteers, and adoptive families.
+        </p>
         <div>
-            <a href="/admin/" class="btn">🔐 Admin Panel</a>
-            <a href="/api/auth/register/" class="btn btn-outline">📝 Register</a>
-        </div>
-
-        <div class="status">
-            <strong>✅ Server Status:</strong> Running<br>
-            <strong>📡 API Base:</strong> <span class="api-url">/api/auth/</span>
+            <a href="/register/" class="btn btn-primary" style="background: white; color: #667eea; margin: 10px;">
+                <i class="fas fa-user-plus"></i> Get Started
+            </a>
+            <a href="/login/" class="btn" style="background: rgba(255,255,255,0.2); color: white; margin: 10px;">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </a>
+            <a href="/children/" class="btn" style="background: rgba(255,255,255,0.2); color: white; margin: 10px;">
+                <i class="fas fa-child"></i> View Children
+            </a>
         </div>
     </div>
-</body>
-</html>
+</div>
+
+<div class="container">
+    <h2 style="text-align: center; margin: 40px 0; font-size: 2rem;">What We Offer</h2>
+    <div class="grid">
+        <div class="card">
+            <i class="fas fa-graduation-cap" style="font-size: 2.5rem; color: #667eea;"></i>
+            <h3 style="margin: 15px 0;">Child Sponsorship</h3>
+            <p>Support a child's education, food, and healthcare with monthly sponsorships.</p>
+        </div>
+        <div class="card">
+            <i class="fas fa-balance-scale" style="font-size: 2.5rem; color: #764ba2;"></i>
+            <h3 style="margin: 15px 0;">Adoption Guidance</h3>
+            <p>Get legal guidance and support through the adoption process.</p>
+        </div>
+        <div class="card">
+            <i class="fas fa-hand-holding-heart" style="font-size: 2.5rem; color: #667eea;"></i>
+            <h3 style="margin: 15px 0;">Volunteer Registration</h3>
+            <p>Volunteer your time and skills to help children in need.</p>
+        </div>
+        <div class="card">
+            <i class="fas fa-robot" style="font-size: 2.5rem; color: #764ba2;"></i>
+            <h3 style="margin: 15px 0;">AI Chatbot Support</h3>
+            <p>Get instant answers to your questions about adoption and donations.</p>
+        </div>
+        <div class="card">
+            <i class="fas fa-chart-bar" style="font-size: 2.5rem; color: #667eea;"></i>
+            <h3 style="margin: 15px 0;">Analytics Dashboard</h3>
+            <p>Track donations, sponsorships, and impact in real-time.</p>
+        </div>
+        <div class="card">
+            <i class="fas fa-calendar-check" style="font-size: 2.5rem; color: #764ba2;"></i>
+            <h3 style="margin: 15px 0;">Visit Scheduling</h3>
+            <p>Schedule visits to NGOs and meet the children you're supporting.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
