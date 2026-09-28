@@ -4,7 +4,17 @@
 
 {% block content %}
 <div class="container">
-    <h2 style="margin: 30px 0;"><i class="fas fa-child" style="color: #667eea;"></i> Children</h2>
+    <h2 style="margin: 30px 0;">
+        <i class="fas fa-child" style="color: #667eea;"></i> Children
+    </h2>
+
+    <div class="alert alert-info" style="margin-bottom: 20px;">
+        <i class="fas fa-info-circle"></i>
+        <strong>Interested in adoption?</strong>
+        Browse child profiles below, then
+        <a href="/adoption-guide/" style="color: #667eea; font-weight: 600;">read our adoption guide</a>
+        to understand the process.
+    </div>
 
     <div id="childrenContainer">
         <p>Loading children...</p>
@@ -23,16 +33,48 @@
                 container.innerHTML = data.children.map(child => `
                     <div class="card" style="margin: 15px 0;">
                         <div style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
-                            <div style="flex: 1;">
+                            <div style="flex: 1; min-width: 250px;">
                                 <h3>${child.name}</h3>
                                 <p><i class="fas fa-calendar-alt"></i> Age: ${child.age}</p>
                                 <p><i class="fas fa-venus-mars"></i> Gender: ${child.gender}</p>
-                                <p><i class="fas fa-heart" style="color: ${child.is_sponsored ? '#28a745' : '#ff6b6b'}"></i>
-                                    ${child.is_sponsored ? 'Sponsored' : 'Available for Sponsorship'}
-                                </p>
-                                ${!child.is_sponsored ? `<a href="/sponsor/${child.child_id}/" class="btn btn-primary" style="margin-top: 10px;">
-                                    <i class="fas fa-hand-holding-heart"></i> Sponsor Now
-                                </a>` : ''}
+
+                                ${child.is_sponsored ? `
+                                    <p style="color: #28a745;">
+                                        <i class="fas fa-check-circle"></i> Sponsored
+                                    </p>
+                                ` : `
+                                    <p style="color: #ff6b6b;">
+                                        <i class="fas fa-heart"></i> Available for Sponsorship
+                                    </p>
+                                `}
+
+                                ${child.is_available_for_adoption ? `
+                                    <p style="color: #28a745;">
+                                        <i class="fas fa-balance-scale"></i> Available for Adoption
+                                    </p>
+                                ` : ''}
+                            </div>
+
+                            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                <!-- ✅ ALWAYS show View Profile -->
+                                <a href="/child/${child.child_id}/" class="btn btn-outline">
+                                    <i class="fas fa-user"></i> View Profile
+                                </a>
+
+                                <!-- ✅ Show Sponsor Now ONLY if NOT sponsored -->
+                                ${!child.is_sponsored ? `
+                                    <a href="/sponsor/${child.child_id}/" class="btn btn-primary">
+                                        <i class="fas fa-hand-holding-heart"></i> Sponsor Now
+                                    </a>
+                                ` : ''}
+
+                                <!-- ✅ Show Book Visit ONLY if available for adoption -->
+                                ${child.is_available_for_adoption ? `
+                                    <a href="/book-visit/?child=${child.child_id}&ngo=${child.ngo_id}"
+                                       class="btn btn-primary" style="background: linear-gradient(135deg, #28a745, #20c997);">
+                                        <i class="fas fa-calendar-check"></i> Book a Visit
+                                    </a>
+                                ` : ''}
                             </div>
                         </div>
                     </div>
@@ -47,7 +89,7 @@
         } catch (error) {
             document.getElementById('childrenContainer').innerHTML = `
                 <div class="alert alert-info">
-                    <i class="fas fa-info-circle"></i> No children added yet. (Coming soon!)
+                    <i class="fas fa-info-circle"></i> No children added yet.
                 </div>
             `;
         }
