@@ -205,19 +205,26 @@
 </head>
 <body>
     <!-- Navbar -->
+   
     <nav class="navbar">
-        <a href="/" class="navbar-brand">
-            <i class="fas fa-hand-holding-heart"></i> HopeBridge
-        </a>
-        <div class="navbar-links">
+    <a href="/" class="navbar-brand">
+        <i class="fas fa-hand-holding-heart"></i> HopeBridge
+    </a>
+    <div class="navbar-links">
+        {% if request.session.user_id %}
             <a href="/"><i class="fas fa-home"></i> Home</a>
             <a href="/children/"><i class="fas fa-child"></i> Children</a>
             <a href="/ngos/"><i class="fas fa-building"></i> NGOs</a>
+            <a href="/adoption-guide/"><i class="fas fa-book"></i> Adoption Guide</a>
             <a href="/dashboard/"><i class="fas fa-chart-pie"></i> Dashboard</a>
             <a href="/profile/"><i class="fas fa-user"></i> Profile</a>
             <a href="/logout/" class="btn btn-outline">Logout</a>
-        </div>
-    </nav>
+        {% else %}
+            <a href="/login/" class="btn btn-primary">Login</a>
+            <a href="/register/" class="btn btn-outline">Register</a>
+        {% endif %}
+    </div>
+</nav>
 
     <!-- Main Content -->
     <main>

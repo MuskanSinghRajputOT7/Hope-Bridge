@@ -39,6 +39,13 @@ def login(request):
     if user:
         token = generate_jwt_token(user)
         serializer = UserSerializer(user)
+
+         # ✅ SAVE USER IN SESSION (Server-side)
+        request.session['user_id'] = user.user_id
+        request.session['email'] = user.email
+        request.session['role'] = user.role
+        request.session['name'] = user.name
+
         return Response({
             'success': True,
             'token': token,
@@ -121,24 +128,70 @@ def create_ngo(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def list_ngos(request):
-    ngos = NGO.objects.filter(is_verified=True)
-    serializer = NGOSerializer(ngos, many=True)
-    return Response({
-        'count': len(serializer.data),
-        'ngos': serializer.data
-    })
+    from apps.donations.models import Child
 
+    ngos = NGO.objects.filter(is_verified=True)
+    data = []
+    for ngo in ngos:
+        child_count = Child.objects.filter(ngo=ngo).count()
+        data.append({
+            'ngo_id': ngo.ngo_id,
+            'name': ngo.name,
+            'city': ngo.city,
+            'state': ngo.state,
+            'address': ngo.address,
+            'phone': ngo.phone,
+            'email': ngo.email,
+            'mission': ngo.mission,
+            'capacity': ngo.capacity,
+            'total_children': child_count,  # ← Dynamic count
+            'profile_photo': ngo.profile_photo.url if ngo.profile_photo else None,
+            'is_verified': ngo.is_verified,
+        })
+    return Response({
+        'count': len(data),
+        'ngos': data
+    })
 
 # ============ GET SINGLE NGO ============
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_ngo(request, ngo_id):
-    """Get single NGO details"""
+    """Get single NGO details with actual child count"""
     try:
+        from apps.donations.models import Child
+
         ngo = NGO.objects.get(ngo_id=ngo_id)
-        serializer = NGOSerializer(ngo)
-        return Response(serializer.data)
+        actual_children_count = Child.objects.filter(ngo=ngo).count()
+
+        return Response({
+            'ngo_id': ngo.ngo_id,
+            'name': ngo.name,
+            'registration_number': ngo.registration_number,
+            'address': ngo.address,
+            'city': ngo.city,
+            'state': ngo.state,
+            'pincode': ngo.pincode,
+            'phone': ngo.phone,
+            'email': ngo.email,
+            'mission': ngo.mission,
+            'capacity': ngo.capacity,
+            'total_children': actual_children_count,
+            'profile_photo': ngo.profile_photo.url if ngo.profile_photo else None,
+            'is_verified': ngo.is_verified,
+        })
     except NGO.DoesNotExist:
         return Response({
             'error': 'NGO not found'
         }, status=status.HTTP_404_NOT_FOUND)
+
+@csrf_exempt
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def logout(request):
+    """Clear user session"""
+    request.session.flush()
+    return Response({
+        'success': True,
+        'message': 'Logged out successfully'
+    })
