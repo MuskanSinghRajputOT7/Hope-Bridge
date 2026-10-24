@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block title %}Analytics Dashboard - HopeBridge{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top: 30px;">
+    <h2><i class="fas fa-chart-line" style="color: #667eea;"></i> Analytics Dashboard</h2>
+
+    <div class="grid" style="margin-top: 30px;">
+        <div class="stat-card">
+            <h3 id="totalDonations">₹0</h3>
+            <p>Total Donations</p>
+        </div>
+        <div class="stat-card">
+            <h3 id="totalSponsorships">0</h3>
+            <p>Active Sponsorships</p>
+        </div>
+        <div class="stat-card">
+            <h3 id="totalChildren">0</h3>
+            <p>Children Supported</p>
+        </div>
+        <div class="stat-card">
+            <h3 id="totalVisits">0</h3>
+            <p>Total Visits</p>
+        </div>
+    </div>
+
+    <div class="card" style="margin-top: 30px;">
+        <h3>📊 Donation Trend (Last 6 Months)</h3>
+        <canvas id="donationChart" style="max-height: 300px; margin-top: 20px;"></canvas>
+    </div>
+
+    <div class="card" style="margin-top: 30px;">
+        <h3>👶 Children Sponsored by Type</h3>
+        <canvas id="sponsorshipChart" style="max-height: 300px; margin-top: 20px;"></canvas>
+    </div>
+
+    <div class="card" style="margin-top: 30px;">
+        <h3>🏢 Top NGOs</h3>
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: #f5f5f5;">
+                    <th style="padding: 10px; text-align: left;">NGO Name</th>
+                    <th style="padding: 10px; text-align: right;">Donations (₹)</th>
+                    <th style="padding: 10px; text-align: right;">Children</th>
+                </tr>
+            </thead>
+            <tbody id="topNgosTable">
+                <tr><td colspan="3" style="padding: 20px; text-align: center;">Loading...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Demo data (will be replaced by Member 4's API)
+    const donationData = {
+        labels: ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+        datasets: [{
+            label: 'Donations (₹)',
+            data: [25000, 32000, 28000, 45000, 52000, 48000],
+            backgroundColor: 'rgba(102, 126, 234, 0.5)',
+            borderColor: '#667eea',
+            borderWidth: 2,
+            tension: 0.3
+        }]
+    };
+
+    const sponsorshipData = {
+        labels: ['Education', 'Food', 'Healthcare', 'Full Support'],
+        datasets: [{
+            data: [18, 12, 8, 5],
+            backgroundColor: ['#667eea', '#764ba2', '#28a745', '#ffc107']
+        }]
+    };
+
+    new Chart(document.getElementById('donationChart'), {
+        type: 'line',
+        data: donationData,
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+
+    new Chart(document.getElementById('sponsorshipChart'), {
+        type: 'doughnut',
+        data: sponsorshipData,
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+
+    // Load top NGOs
+    async function loadTopNgos() {
+        try {
+            const res = await fetch('/api/auth/ngo/list/');
+            const data = await res.json();
+            const tbody = document.getElementById('topNgosTable');
+            tbody.innerHTML = (data.ngos || []).map(n => `
+                <tr style="border-bottom: 1px solid #eee;">
+                    <td style="padding: 10px;">${n.name}</td>
+                    <td style="padding: 10px; text-align: right;">₹${(Math.random() * 50000).toFixed(0)}</td>
+                    <td style="padding: 10px; text-align: right;">${n.total_children || 0}</td>
+                </tr>
+            `).join('') || '<tr><td colspan="3" style="padding: 20px; text-align: center;">No NGOs yet.</td></tr>';
+        } catch (e) {
+            console.log('Could not load NGOs');
+        }
+    }
+    loadTopNgos();
+</script>
+{% endblock %}
